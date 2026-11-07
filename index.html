@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a0a0a"><title>حجز موعد</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.c{width:100%;max-width:420px;background:#161616;border:1px solid #2a2a2a;border-radius:22px;padding:22px}h1{margin:0 0 4px;font-size:20px}.s{color:#9ca3af;font-size:13px;margin-bottom:16px}
+label{display:block;font-size:12px;color:#cbd5e1;margin:10px 0 4px}input,select,textarea{width:100%;background:#0f0f0f;border:1px solid #333;color:#fff;border-radius:12px;padding:11px;font-size:15px;font-family:inherit}
+button{width:100%;margin-top:18px;border:0;border-radius:14px;padding:14px;background:#16a34a;color:#fff;font-weight:800;font-size:16px;cursor:pointer}.e{color:#fca5a5;font-size:13px;margin-top:8px;min-height:16px}.f{text-align:center;color:#6b7280;font-size:11px;margin-top:14px}</style></head><body>
+<div class="c"><h1 id="t">حجز موعد</h1><div class="s" id="sub">املأ البيانات وأرسل طلب الحجز للعيادة، وهتأكد لك الموعد.</div><div id="ok" style="display:none;text-align:center;padding:20px 0"><div style="font-size:44px">✅</div><b id="okt">وصل طلبك للعيادة</b><div class="s">هنتواصل معك لتأكيد الموعد.</div></div><div id="dr" style="display:none;margin:0 0 6px;padding:10px 12px;border-radius:14px;background:#0f2a1a;border:1px solid #25d366;color:#bbf7d0;font-size:14px;font-weight:700"></div><div id="fm">
+<label>الاسم</label><input id="n" autocomplete="name"><label>رقم الموبايل</label><input id="p" type="tel" dir="ltr" autocomplete="tel">
+<label>التاريخ</label><input id="d" type="date"><label>الوقت المفضل</label><input id="h" type="time" value="10:00">
+<label>نوع الزيارة</label><select id="y"><option>كشف</option><option>تنظيف وتلميع</option><option>حشو</option><option>علاج عصب</option><option>خلع</option><option>تقويم</option><option>طوارئ</option><option>أخرى</option></select>
+<label>ملاحظات (اختياري)</label><textarea id="m" rows="2"></textarea><div class="e" id="e"></div><button id="b">إرسال طلب الحجز</button></div><div class="f">Developed by X Dev Pro</div></div>
+<script>
+var SB='https://imvhajeogqxqdcusnkyl.supabase.co',AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltdmhhamVvZ3F4cWRjdXNua3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5NTIzMDksImV4cCI6MjEwODUyODMwOX0.cfunkCBjVtZq3KpAYRcIUQgP1qNOkD0mHNo5uHmSBNc';
+var q=new URLSearchParams(location.search),cid=q.get('c')||'',cn=q.get('n')||'',dk=q.get('d')||'';
+function $(i){return document.getElementById(i)}function v(i){return $(i).value.trim()}
+function ttl(n){if(n)$('t').textContent='حجز موعد — '+n}ttl(cn);
+var d=$('d'),t=new Date();d.min=d.value=t.toISOString().slice(0,10);
+function rpc(fn,b){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
+if(cid)rpc('booking_info2',{p_office:cid,p_dkey:dk}).then(function(r){if(r&&r.name){ttl(r.name);if(r.doctor){$('dr').style.display='block';$('dr').textContent='🩺 طلب الحجز هيتم إرساله إلى: د. '+r.doctor;window.__dn=r.doctor}}else if(r===null){$('e').textContent='صفحة الحجز غير متاحة حالياً.';$('b').disabled=true}}).catch(function(){});
+if(!cid){$('e').textContent='رابط الحجز غير مكتمل.';$('b').disabled=true}
+function chk(){var e=$('e');if(!v('n')||v('p').replace(/\D/g,'').length<8||!v('d')||!v('h')){e.textContent='اكتب الاسم ورقم موبايل صحيح والتاريخ والوقت.';return false}e.textContent='';return true}
+var ERR={closed:'العيادة لا تستقبل حجوزات حالياً.',invalid:'راجع البيانات المكتوبة.',date:'اختر تاريخاً صحيحاً.',notpatient:'هذا الرابط خاص بمرضى الدكتور فقط. استخدم رقم الموبايل المسجّل في العيادة أو اتصل بالعيادة.',limit:'تم تجاوز عدد الطلبات، حاول لاحقاً أو اتصل بالعيادة.'};
+$('b').onclick=function(){if(!chk())return;var b=$('b');b.disabled=true;b.textContent='جاري الإرسال...';
+ rpc('booking_submit2',{p_office:cid,p_name:v('n'),p_phone:v('p'),p_date:v('d'),p_time:v('h'),p_type:v('y'),p_note:v('m'),p_dkey:dk}).then(function(r){
+  if(r&&r.ok){$('fm').style.display='none';$('sub').style.display='none';$('ok').style.display='block';if(window.__dn)$('okt').textContent='وصل طلبك للدكتور '+window.__dn}else{$('e').textContent=ERR[r&&r.err]||'تعذر الإرسال، حاول مرة أخرى.';b.disabled=false;b.textContent='إرسال طلب الحجز'}
+ }).catch(function(){$('e').textContent='تعذر الاتصال بالإنترنت.';b.disabled=false;b.textContent='إرسال طلب الحجز'})};
+</script></body></html>
